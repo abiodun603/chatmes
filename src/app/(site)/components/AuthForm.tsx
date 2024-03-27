@@ -4,6 +4,7 @@ import { useCallback, useState } from "react"
 
 // ** Third Party
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
+import axios from "axios"
 
 // ** Icon
 import AuthSocialButton from "./AuthSocialButton"
@@ -39,11 +40,11 @@ export const AuthForm = () => {
     }
   })
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async(data) => {
     setIsLoading(true);
 
     if(variant === "REGISTER"){
-      // Axios Registr
+      axios.post('/api/register', data)
     }  
 
     if(variant === "LOGIN"){

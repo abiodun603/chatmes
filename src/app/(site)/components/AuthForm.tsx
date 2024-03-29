@@ -5,6 +5,7 @@ import { useCallback, useState } from "react"
 // ** Third Party
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import axios from "axios"
+import { signIn } from "next-auth/react"
 
 // ** Icon
 import AuthSocialButton from "./AuthSocialButton"
@@ -13,6 +14,7 @@ import { BsGithub, BsGoogle } from "react-icons/bs"
 // ** Component
 import Input from "@/app/components/ui/Input"
 import Button from "@/app/components/ui/Button"
+import toast from "react-hot-toast"
 
 
 type Variant = "LOGIN" | "REGISTER"
@@ -44,11 +46,39 @@ export const AuthForm = () => {
     setIsLoading(true);
 
     if(variant === "REGISTER"){
-      axios.post('/api/register', data)
+      try {
+        axios.post('/api/register', data)
+        toast.success("Account has been created !!!")
+      } catch (error) {
+        toast.error("Something went wrong!!!")
+      } finally {
+        
+        setIsLoading(false);
+      }
     }  
 
     if(variant === "LOGIN"){
       // Next Auth Signin
+      try {
+        signIn('credentials', {
+          ...data,
+          redirect: false,
+        })
+        .then((callback) => {
+          if(callback?.error){
+            toast.error("invalid credentials")
+          }
+  
+          if(callback?.ok && !callback?.error){
+            toast.success("Logged in!");
+          }
+        })
+      } catch (error) {
+        toast.error("Something went wrong!!!")
+      } finally{
+        setIsLoading(false);
+      }
+      
     }  
   }
 
@@ -56,6 +86,17 @@ export const AuthForm = () => {
     setIsLoading(true);
 
     // Next Auth Social Sign in
+    signIn(action, { redirect: false })
+    .then((callback) => {
+      if(callback?.error){
+        toast.error('Invalid Credentials');
+      }
+
+      if(callback?.ok && !callback?.error){
+        toast.success('Logged In');
+      }
+    })
+    .finally(() => setIsLoading(false));
   }
   
   return (
@@ -102,7 +143,7 @@ export const AuthForm = () => {
             {variant === "LOGIN" ? 'New to Messenger?' : 'Already have an account?'}
           </div>
           <div className="underline cursor-pointer" onClick={toggleVariant}>
-            
+            {variant === "LOGIN" ? 'Sign up?' : 'Sign in'}
           </div>
         </div>
       </div>

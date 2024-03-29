@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { AuthOptions } from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
